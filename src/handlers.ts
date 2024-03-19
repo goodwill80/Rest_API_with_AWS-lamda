@@ -4,7 +4,11 @@ import { v4 } from "uuid";
 
 const docClient = new AWS.DynamoDB.DocumentClient();
 const tableName = "ProductsTable";
+const headers = {
+  "content-type": "application/json",
+};
 
+// Custom Error Class
 class HttpError extends Error {
   constructor(public statusCode: number, body: Record<string, unknown> = {}) {
     super(JSON.stringify(body));
@@ -33,6 +37,7 @@ const handleError = (e: unknown) => {
   if (e instanceof HttpError) {
     return {
       statusCode: e.statusCode,
+      headers,
       body: e.message,
     };
   }
@@ -57,6 +62,7 @@ export const createProduct = async (event: APIGatewayProxyEvent): Promise<APIGat
 
   return {
     statusCode: 201,
+    headers,
     body: JSON.stringify(product),
   };
 };
@@ -67,12 +73,14 @@ export const getProduct = async (event: APIGatewayProxyEvent): Promise<APIGatewa
     const product = await fetchProductById(event.pathParameters?.id as string);
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify(product),
     };
   } catch (e) {
     if (e instanceof HttpError) {
       return {
         statusCode: e.statusCode,
+        headers,
         body: e.message,
       };
     }
@@ -102,6 +110,7 @@ export const updateProduct = async (event: APIGatewayProxyEvent): Promise<APIGat
 
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify(product),
     };
   } catch (e) {
@@ -126,6 +135,7 @@ export const deleteProduct = async (event: APIGatewayProxyEvent): Promise<APIGat
 
     return {
       statusCode: 204,
+      headers,
       body: "",
     };
   } catch (e) {
@@ -143,6 +153,7 @@ export const listProduct = async (event: APIGatewayProxyEvent): Promise<APIGatew
 
   return {
     statusCode: 200,
+    headers,
     body: JSON.stringify(output.Items),
   };
 };

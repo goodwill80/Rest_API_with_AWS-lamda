@@ -1,12 +1,20 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import AWS from "aws-sdk";
 import { v4 } from "uuid";
+import * as yup from "yup";
 
 const docClient = new AWS.DynamoDB.DocumentClient();
 const tableName = "ProductsTable";
 const headers = {
   "content-type": "application/json",
 };
+
+const schema = yup.object().shape({
+  name: yup.string().required(),
+  description: yup.string().required(),
+  price: yup.number().required(),
+  available: yup.boolean().required(),
+});
 
 // Custom Error Class
 class HttpError extends Error {
@@ -34,6 +42,22 @@ const fetchProductById = async (id: string) => {
 
 // Helper to handle error
 const handleError = (e: unknown) => {
+  if (e instanceof yup.ValidationError) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({
+        errors: e.errors,
+      }),
+    };
+  }
+  if (e instanceof SyntaxError) {
+    return {
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ errors: `invalid request body format : ${e.message}` }),
+    };
+  }
   if (e instanceof HttpError) {
     return {
       statusCode: e.statusCode,
@@ -46,25 +70,29 @@ const handleError = (e: unknown) => {
 
 // Post a new product
 export const createProduct = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  const reqBody = JSON.parse(event.body as string);
+  try {
+    const reqBody = JSON.parse(event.body as string);
+    await schema.validate(reqBody, { abortEarly: false });
+    const product = {
+      ...reqBody,
+      productID: v4(),
+    };
 
-  const product = {
-    ...reqBody,
-    productID: v4(),
-  };
+    await docClient
+      .put({
+        TableName: tableName,
+        Item: product,
+      })
+      .promise();
 
-  await docClient
-    .put({
-      TableName: tableName,
-      Item: product,
-    })
-    .promise();
-
-  return {
-    statusCode: 201,
-    headers,
-    body: JSON.stringify(product),
-  };
+    return {
+      statusCode: 201,
+      headers,
+      body: JSON.stringify(product),
+    };
+  } catch (e) {
+    return handleError(e) as APIGatewayProxyResult;
+  }
 };
 
 // Get a product by ID
@@ -95,6 +123,7 @@ export const updateProduct = async (event: APIGatewayProxyEvent): Promise<APIGat
     await fetchProductById(id as string);
 
     const reqBody = JSON.parse(event.body as string);
+    await schema.validate(reqBody, { abortEarly: false });
 
     const product = {
       ...reqBody,

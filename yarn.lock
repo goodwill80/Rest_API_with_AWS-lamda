@@ -1055,6 +1055,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/uuid@^9.0.8":
+  "integrity" "sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA=="
+  "resolved" "https://registry.npmjs.org/@types/uuid/-/uuid-9.0.8.tgz"
+  "version" "9.0.8"
+
 "2-thenable@^1.0.0":
   "integrity" "sha512-HqiDzaLDFCXkcCO/SwoyhRwqYtINFHF7t9BDRq4x90TOKNAJpiqUt9X5lQ08bwxYzc067HUywDjGySpebHcUpw=="
   "resolved" "https://registry.npmjs.org/2-thenable/-/2-thenable-1.0.0.tgz"
@@ -3869,12 +3874,7 @@
   "resolved" "https://registry.npmjs.org/uuid/-/uuid-8.3.2.tgz"
   "version" "8.3.2"
 
-"uuid@^9.0.0":
-  "integrity" "sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA=="
-  "resolved" "https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz"
-  "version" "9.0.1"
-
-"uuid@^9.0.1":
+"uuid@^9.0.0", "uuid@^9.0.1":
   "integrity" "sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA=="
   "resolved" "https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz"
   "version" "9.0.1"
